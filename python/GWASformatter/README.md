@@ -7,6 +7,7 @@ removed. Allele frequencies and effect sizes will be flipped to match the allele
 `--ref-a1-col` flag. All columns of the output files will be compatible to tht SNP reference file.
 
 The `--sum-file-out` flag specified file will contain the following columns:
+```
 CHR    chromosome
 BP     basepair coordinate
 SNP    SNP ID
@@ -17,6 +18,7 @@ BETA   effect size of A1
 SE     stderr of effect size
 P      p-value
 Neff   effective sample size
+```
 
 The `--gcta-out` flag specified output file will contain columns of SNP, A1, A2, FRQ, BETA, SE, P and
 Neff. The `--ldsc-out` flag specified output file will contain columns of SNP, A1, A2, N and Z. These
