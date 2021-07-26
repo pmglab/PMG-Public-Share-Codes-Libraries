@@ -1,3 +1,4 @@
+**Written by Dr. Miao**
 This Python script formats GWAS summary statistics to KGGSEE compatible format, GCTA format and
 LDSC format. A SNP reference file contains columns of chromosome, basepair coordinate, SNP ID,
 allele 1, allele 2, and allele 1 frequency will be loaded. The input GWAS summary statistics will
