@@ -11,3 +11,5 @@ An example of ExecutorService usage in java.
 An example of calling shell in java.
 ### CoverageCalculation
 Calculate the coverage and depth at whole genome exons by samtools.
+# Collaborator
+[Xue Chao](https://github.com/chaoxue-sysu), [Miao Lin](https://github.com/WoodyMiao), [Qihan Long](https://github.com/longqh3)
