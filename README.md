@@ -4,6 +4,8 @@ The project provides some code sharing by members of Precision Medicine Genetics
 The directory ./python list some useful python code.
 ### pvalue_adjust_FDR
 pvalue_adjust_FDR.py, adjust the pvalue by Benjamini & Hochberg FDR.
+### GWASformatter
+Formats GWAS summary statistics to KGGSEE compatible format, GCTA format and LDSC format.
 ## JAVA
 ### ThreadPool.java
 An example of ExecutorService usage in java.
