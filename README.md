@@ -3,7 +3,7 @@ The project provides some code sharing by members of Precision Medicine Genetics
 ## PYTHON
 The directory ./python list some useful python code.
 ### Functions
-batchSehllTask.py —— Small and useful function code to execute shell commands paralleled. 
+batchShellTask.py —— Small and useful function code to execute shell commands paralleled. 
 ### pvalue_adjust_FDR
 pvalue_adjust_FDR.py, adjust the pvalue by Benjamini & Hochberg FDR.
 ### GWASformatter
