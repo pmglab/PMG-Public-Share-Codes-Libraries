@@ -6,6 +6,8 @@ The directory ./python list some useful python code.
 batchShellTask.py —— Small and useful function code to execute shell commands paralleled. 
 ### pvalue_adjust_FDR
 pvalue_adjust_FDR.py, adjust the pvalue by Benjamini & Hochberg FDR.
+### md5Check
+md5Check.py, check md5 value of provided files contained within GDC manifest paralleled.
 ### GWASformatter
 Formats GWAS summary statistics to KGGSEE compatible format, GCTA format and LDSC format.
 ## JAVA
