@@ -24,7 +24,7 @@ def md5_status_getter(file_loc, given_md5_value, return_list):
     if real_md5.split()[0] == given_md5_value:
         return_list.append(f"{file_loc} had been verified successfully.")
     else:
-        return_list.append(f"\nFail warning: Be advised, {file_loc} failed md5 check.\n")
+        return_list.append(f"\nFail warning: Be advised, {file_loc} failed md5 check. Provided md5 was {given_md5_value}, whereas calculated md5 was {real_md5.split()[0]}\n")
 
 if __name__=='__main__':
     # Create a list to store md5-check results
