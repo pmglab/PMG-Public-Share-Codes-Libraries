@@ -27,7 +27,7 @@ A1     the effect allele
 A2     the other allele
 FRQ    frequency of A1
 BETA   effect size of A1
-SE     stderr of effect size
+SE     stderr of BETA
 P      p-value
 Neff   effective sample size
 
@@ -47,7 +47,6 @@ parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFo
                                  description='This Python script formats GWAS summary statistics to KGGSEE compatible format, GCTA format and LDSC format.')
 
 parser.add_argument('--sum-file-in',  default='NA',  type=str,   help='Input file. This flag is required.', required=True)
-parser.add_argument('--delimiter',    default='\s+', type=str,   help='The delimiter of the --sum-file-in file. Specify "," for a CSV file.')
 parser.add_argument('--sum-file-out', default='NA',  type=str,   help='Output file of a KGGSEE compatible format. This flag is required.', required=True)
 parser.add_argument('--gcta-out',     default='NA',  type=str,   help='Output file of the GCTA format. This file should have an extension of ".ma". This flag is optional.')
 parser.add_argument('--ldsc-out',     default='NA',  type=str,   help='Output file of the LDSC format. This flag is optional.')
@@ -58,24 +57,26 @@ parser.add_argument('--a1-col',       default='A1',  type=str,   help='Name of t
 parser.add_argument('--a2-col',       default='A2',  type=str,   help='Name of the non-effect allele column.')
 parser.add_argument('--freq-a1-col',  default='NA',  type=str,   help='Name of the effect allele frequency column. If not specified, the reference file FRQ column will be used.')
 parser.add_argument('--beta-col',     default='NA',  type=str,   help='Name of the effect size column. Either the --beta-col or --or-col flag is required.')
+parser.add_argument('--beta-se-col',  default='NA',  type=str,   help='Name of the beta (log odds ratio) standard error column. Either the --beta-se-col or (--or-95l-col and--or-95u-col) flag is required.')
 parser.add_argument('--or-col',       default='NA',  type=str,   help='Name of the odds ratio column. If --beta-col is specified, this flag is ignored.')
-parser.add_argument('--se-col',       default='SE',  type=str,   help='Name of the beta (log odds ratio) standard error column.')
+parser.add_argument('--or-95l-col',   default='NA',  type=str,   help='Name of the odds ratio 0.95 lower confidence limit column. If --beta-se-col is specified, this flag is ignored.')
+parser.add_argument('--or-95u-col',   default='NA',  type=str,   help='Name of the odds ratio 0.95 upper confidence limit column. If --beta-se-col is specified, this flag is ignored.')
 parser.add_argument('--p-col',        default='P',   type=str,   help='Name of the p-value column.')
 parser.add_argument('--nmiss-col',    default='NA',  type=str,   help='Name of the sample size column. Either the --nmiss-col or --n flag is required.')
 parser.add_argument('--neff',         default=0.0,   type=float, help='GWAS sample size. If --nmiss-col is specified, this flag is ignored.')
 parser.add_argument('--info-col',     default='NA',  type=str,   help='Name of the imputation information score column. This argument is optional.')
 parser.add_argument('--info-min',     default=0.9,   type=float, help='Minimum INFO score. If --info-col is not specifed, this flag is ignored.')
 
-default_ref_file_in = f'{os.path.dirname(os.path.realpath(__file__))}/1kgEURmac5_UKBinfo9_BothAllelesMatched_hg19_dbSNPb151.tsv.gz'
-parser.add_argument('--ref-file-in',     default=default_ref_file_in,       type=str, help='The SNP reference file.')
-parser.add_argument('--ref-chrom-col',   default='hg19_chr',                type=str, help='Name of the chromosome column of the reference file.')
-parser.add_argument('--ref-pos-col',     default='hg19_bp',                 type=str, help='Name of the SNP coordinate column of the reference file.')
-parser.add_argument('--ref-snp-col',     default='rsid',                    type=str, help='Name of the SNP ID column of the reference file.')
-parser.add_argument('--ref-a1-col',      default='hg19_alt',                type=str, help='Name of the allele column of the reference file, by which the effect allele will be mapped.')
-parser.add_argument('--ref-a2-col',      default='hg19_ref',                type=str, help='Name of the allele column of the reference file, by which the non-effect allele will be mapped')
-parser.add_argument('--ref-freq-a1-col', default='hg19_alt_1kgEUR_frq',     type=str, help='Name of the effect allele frequency column of the reference file.')
-parser.add_argument('--ref-gcta-col',    default='nonHLA',                  type=str, help='Name of a booleanizable-value column, by which the program masks the GCTA-format output. Specify "NA" to disable mask.')
-parser.add_argument('--ref-ldsc-col',    default='nonHLA_HapMap3_autosome', type=str, help='Name of a booleanizable-value column, by which the program masks the LDSC-format output. Specify "NA" to disable mask.')
+default_ref_file_in = f'{os.path.dirname(os.path.realpath(__file__))}/1kgEURmac5_UKBinfo9_BothAllelesMatched_hg19_dbSNPb151.lite.tsv.gz'
+parser.add_argument('--ref-file-in',     default=default_ref_file_in,   type=str, help='The SNP reference file.')
+parser.add_argument('--ref-chrom-col',   default='hg19_chr',            type=str, help='Name of the chromosome column of the reference file.')
+parser.add_argument('--ref-pos-col',     default='hg19_bp',             type=str, help='Name of the SNP coordinate column of the reference file.')
+parser.add_argument('--ref-snp-col',     default='rsid',                type=str, help='Name of the SNP ID column of the reference file.')
+parser.add_argument('--ref-a1-col',      default='hg19_alt',            type=str, help='Name of the allele column of the reference file, by which the effect allele will be mapped.')
+parser.add_argument('--ref-a2-col',      default='hg19_ref',            type=str, help='Name of the allele column of the reference file, by which the non-effect allele will be mapped')
+parser.add_argument('--ref-freq-a1-col', default='hg19_alt_1kgEUR_frq', type=str, help='Name of the effect allele frequency column of the reference file.')
+parser.add_argument('--ref-gcta-col',    default='NA',                  type=str, help='Name of a booleanizable-value column, by which the program masks the GCTA-format output. Specify "NA" to disable mask.')
+parser.add_argument('--ref-ldsc-col',    default='NA',                  type=str, help='Name of a booleanizable-value column, by which the program masks the LDSC-format output. Specify "NA" to disable mask.')
 
 
 
@@ -98,9 +99,8 @@ def check_file_writable(fnm):
 
 def check_argument(args):
     args = pd.Series(args.__dict__)
-
     try:
-        df = pd.read_csv(args.sum_file_in, sep=args.delimiter, nrows=0)
+        df = pd.read_csv(args.sum_file_in, sep='\s+', nrows=0)
     except FileNotFoundError:
         sys.exit(f'\nError: "{args.sum_file_in}" is not readable.\n')
     try:
@@ -111,8 +111,8 @@ def check_argument(args):
         sys.exit(f'\nError: "{args.sum_file_out}" is not writable.\n')
 
     # Initialize a dict of valid arguments. The following arguments are either required or prespecified.
-    essential_col = ['sum_file_in', 'delimiter', 'sum_file_out', 'a1_col', 'a2_col', 'se_col', 'p_col',
-                     'ref_file_in', 'ref_chrom_col', 'ref_pos_col', 'ref_snp_col', 'ref_a1_col', 'ref_a2_col', 'ref_freq_a1_col']
+    essential_col = ['ref_file_in', 'ref_chrom_col', 'ref_pos_col', 'ref_snp_col', 'ref_a1_col', 'ref_a2_col', 'ref_freq_a1_col',
+                     'sum_file_in', 'sum_file_out', 'a1_col', 'a2_col', 'p_col']
     valid_args = args[essential_col]
 
     # Determin wether the coordinate or the ID of SNPs will be used to map alleles to the SNP reference.
@@ -144,6 +144,17 @@ def check_argument(args):
     else:
         print('\nEither the --beta-col or --or-col flag is required.')
         sys.exit(f'Show help message: {sys.argv[0]} -h\n')
+
+    # Determin wether the coordinate or the ID of SNPs will be used to map alleles to the SNP reference.
+    if args.beta_se_col != 'NA':
+        valid_args['beta_se_col'] = args.beta_se_col
+    else:
+        if args.or_95l_col != 'NA' and args.or_95u_col != 'NA':
+            valid_args['or_95l_col'] = args.or_95l_col
+            valid_args['or_95u_col'] = args.or_95u_col
+        else:
+            print('\nEither the --beta-se-col or (--or-95l-col and--or-95u-col) flag is required.')
+            sys.exit(f'Show help message: {sys.argv[0]} -h\n')
 
     # Determin wether the N of GWAS file or the N specified by user will be used.
     if args.nmiss_col != 'NA':
@@ -184,7 +195,7 @@ def check_argument(args):
         log1.append(f'"{args.ldsc_out}" of LDSC format will be output.')
 
     # Check if all specifed columns of --sum-file-in exist.
-    possible_sum_col = ['chrom_col', 'pos_col', 'snp_col', 'a1_col', 'a2_col', 'freq_a1_col', 'beta_col', 'or_col', 'se_col', 'p_col', 'nmiss_col', 'info_col']
+    possible_sum_col = ['chrom_col', 'pos_col', 'snp_col', 'a1_col', 'a2_col', 'freq_a1_col', 'beta_col', 'or_col', 'beta_se_col', 'or_95l_col', 'or_95u_col', 'p_col', 'nmiss_col', 'info_col']
     used_sum_col = valid_args[valid_args.index.isin(possible_sum_col)]
     err_sum_col = used_sum_col[~used_sum_col.isin(df.columns)]
     if err_sum_col.shape[0] != 0:
@@ -212,7 +223,7 @@ def munge_sumstats(x):
 
     # Read SNP reference.
     print(f'Reading {x.ref_file_in}...', flush=True)
-    ref_df = pd.read_csv(x.ref_file_in, sep='\s+', dtype={x.ref_chrom_col:chr_dtype})
+    ref_df = pd.read_csv(x.ref_file_in, sep='\s+', dtype={x.ref_chrom_col:chr_dtype, x.ref_pos_col:pd.Int32Dtype()})
     rename_ref_col = {x.ref_chrom_col:'CHR', x.ref_pos_col:'BP', x.ref_snp_col:'SNP', x.ref_a1_col:'A1', x.ref_a2_col:'A2'}
     if 'freq_a1_col' not in x.index:
         rename_ref_col[x.ref_freq_a1_col] = 'FRQ'
@@ -223,36 +234,47 @@ def munge_sumstats(x):
     ref_df = ref_df[rename_ref_col.keys()].rename(rename_ref_col, axis=1)
 
     # Avoid the potential overriding of A1, A2 and FRQ columns of GWAS file by the SNP reference
-    rename_gwas_col = {x.a1_col:'a1', x.a2_col:'a2', x.se_col:'SE', x.p_col:'P'}
+    rename_gwas_col = {x.a1_col:'a1', x.a2_col:'a2', x.p_col:'P'}
     if 'beta_col' in x.index:
         rename_gwas_col[x.beta_col] = 'BETA'
     if 'nmiss_col' in x.index:
         rename_gwas_col[x.nmiss_col] = 'Neff'
     if 'freq_a1_col' in x.index:
         rename_gwas_col[x.freq_a1_col] = 'FRQ'
+    if 'beta_se_col' in x.index:
+        rename_gwas_col[x.beta_se_col] = 'SE'
 
     print(f'Reading {x.sum_file_in}...', flush=True)
     # Read the GWAS file and map to the SNP reference by either coordinate or ID.
     if 'chrom_col' in x.index:
         rename_gwas_col.update({x.chrom_col:'CHR', x.pos_col:'BP'})
         ref_df.set_index(['CHR','BP'], inplace=True)
-        df = pd.read_csv(x.sum_file_in, sep=x.delimiter, dtype={x.chrom_col:chr_dtype})
+        df = pd.read_csv(x.sum_file_in, sep='\s+', dtype={x.chrom_col:chr_dtype, x.pos_col:pd.Int32Dtype()})
         print(f'Read {df.shape[0]} SNPs.', flush=True)
         df = df.rename(rename_gwas_col, axis=1).set_index(['CHR','BP'])
         df = df[~df.index.duplicated(keep=False)]
         print(f'{df.shape[0]} SNPs with unique coordinate.', flush=True)
-        df[ref_df.columns] = ref_df.reindex(df.index)
-        df = df.dropna().sort_index().reset_index()
+        if 'SNP' in df.columns:
+            df.drop('SNP', axis=1, inplace=True)
     else:
         rename_gwas_col.update({x.snp_col:'SNP'})
         ref_df.set_index('SNP', inplace=True)
-        df = pd.read_csv(x.sum_file_in, sep=x.delimiter)
+        df = pd.read_csv(x.sum_file_in, sep='\s+')
         print(f'Read {df.shape[0]} SNPs.', flush=True)
         df = df.rename(rename_gwas_col, axis=1).set_index('SNP')
         df = df[~df.index.duplicated(keep=False)]
         print(f'{df.shape[0]} SNPs with unique ID.', flush=True)
-        df[ref_df.columns] = ref_df.reindex(df.index)
-        df = df.dropna().sort_values(['CHR','BP']).reset_index()
+        if 'CHR' in df.columns:
+            df.drop('CHR', axis=1, inplace=True)
+        if 'BP' in df.columns:
+            df.drop('BP', axis=1, inplace=True)
+
+
+    # df = pd.concat([df, ref_df], axis=1, join='inner') # This function result in a bug. Only chr1-9 remained in some files.
+    df = df[df.index.isin(ref_df.index)]
+    ref_df = ref_df[ref_df.index.isin(df.index)]
+    df = pd.concat([df, ref_df], axis=1)
+    df = df.reset_index().sort_values(['CHR','BP'])
     print(f'{df.shape[0]} SNPs in reference.', flush=True)
 
     # Filter SNPs by INFO.
@@ -264,6 +286,8 @@ def munge_sumstats(x):
     # Convert OR values to BETA values.
     if 'or_col' in x.index:
         df['BETA'] = np.log(df[x.or_col])
+    if 'or_95l_col' in x.index:
+        df['SE'] = np.abs(np.log(df[x.or_95u_col]/df[x.or_95l_col]) / 3.92)
     # Add an N column.
     if 'neff' in x.index:
         df['Neff'] = round(x.neff)
